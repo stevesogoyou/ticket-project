@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 
 #[Route('/api/user')]
@@ -21,6 +22,19 @@ final class UserController extends AbstractController
     {
         $users = $userRepository->findAll();
         return $this->json($users);
+    }
+
+    #[Route('/role-user', name: 'user_role_user', methods: ['GET'])]
+    public function getUsersWithOnlyRoleUser(UserRepository $userRepository): Response
+    {
+        $users = $userRepository->findUsersWithRoleUser();
+
+        return $this->json(
+            $users,
+            200,
+
+            [AbstractNormalizer::GROUPS => ['user:read']]
+        );
     }
 
     #[Route('/new', name: 'app_user_new', methods: ['POST'])]

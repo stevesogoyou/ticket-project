@@ -28,6 +28,43 @@ class TicketController extends AbstractController
             [AbstractNormalizer::GROUPS => ['ticket:read']]);
     }
 
+    #[Route('/tickets/traites', name: 'ticket_traites', methods: ['GET'])]
+    public function getTraites(TicketRepository $ticketRepository): Response
+    {
+        // Récupère les tickets dont le statut est "traité"
+        $tickets = $ticketRepository->findBy(['status' => 'traité']);
+
+        return $this->json($tickets, 200,
+            [AbstractNormalizer::GROUPS => ['ticket:read']]
+        );
+    }
+
+    #[Route('/tickets/invalides', name: 'ticket_invalides', methods: ['GET'])]
+    public function getInvalides(TicketRepository $ticketRepository): Response
+    {
+        // Récupère les tickets dont le statut est "invalide"
+        $tickets = $ticketRepository->findBy(['status' => 'invalide']);
+
+        return $this->json(
+            $tickets,
+            200,
+            [AbstractNormalizer::GROUPS => ['ticket:read']]
+        );
+    }
+    #[Route('/tickets/nouveaux', name: 'ticket_nouveaux', methods: ['GET'])]
+    public function getNouveaux(TicketRepository $ticketRepository): Response
+    {
+        // Récupère les tickets dont le statut est "nouveau"
+        $tickets = $ticketRepository->findBy(['status' => 'nouveau']);
+
+        return $this->json(
+            $tickets,
+            200,
+            [AbstractNormalizer::GROUPS => ['ticket:read']]
+        );
+    }
+
+
     #[Route('/ticket/new', name: 'ticket_new', methods: ['POST'])]
     public function new(
         Request $request,
@@ -37,19 +74,9 @@ class TicketController extends AbstractController
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
-        // Validation des données
-        if (empty($data['title']) || empty($data['description']) || empty($data['assigned_to_id']) || empty($data['category_id'])) {
+        // Validation des données : title, description, category_id et student_id sont requis
+        if (empty($data['title']) || empty($data['description']) || empty($data['category_id']) || empty($data['student_id'])) {
             return $this->json(['error' => 'Missing required fields.'], 400);
-        }
-
-        // utilisez assigned_to_id pour assignez un int en front
-        // utilisez category_id pour assigner un int en front
-        // utilisez student_id pour assignez un int en front
-
-        // Récupérer l'utilisateur assigné
-        $user = $userRepository->find($data['assigned_to_id']);
-        if (!$user) {
-            return $this->json(['error' => 'User not found.'], 404);
         }
 
         // Récupérer la catégorie
@@ -58,21 +85,28 @@ class TicketController extends AbstractController
             return $this->json(['error' => 'Category not found.'], 404);
         }
 
+        // Récupérer l'étudiant (user) à partir de student_id
+        $student = $userRepository->find($data['student_id']);
+        if (!$student) {
+            return $this->json(['error' => 'Student not found.'], 404);
+        }
+
         // Création du ticket
         $ticket = new Ticket();
         $ticket->setTitle($data['title']);
         $ticket->setDescription($data['description']);
-        $ticket->setAssignedTo($user);
         $ticket->setCategory($category);
+        $ticket->setStudent($student);
 
         // Sauvegarder le ticket dans la base de données
         $entityManager->persist($ticket);
         $entityManager->flush();
 
-        return $this->json($ticket, 201, [], [AbstractNormalizer::GROUPS => ['ticket:read']]);
+        return $this->json($ticket, 201, [], [\Symfony\Component\Serializer\Normalizer\AbstractNormalizer::GROUPS => ['ticket:read']]);
     }
 
-    #[Route('/ticket/{id}', name: 'ticket_show', methods: ['GET'])]
+
+    #[Route('/tickets/nouveaux/{id}', name: 'ticket_show', methods: ['GET'])]
     public function show(Ticket $ticket): Response
     {
         return $this->render('ticket/show.html.twig', [
@@ -80,7 +114,7 @@ class TicketController extends AbstractController
         ]);
     }
 
-    #[Route('/ticket/{id}/edit', name: 'ticket_edit', methods: ['PUT'])]
+    #[Route('/ticket/edit/{id}', name: 'ticket_edit', methods: ['PUT'])]
     public function edit(
         Request $request,
         Ticket $ticket,
@@ -102,6 +136,9 @@ class TicketController extends AbstractController
         // Vous pouvez ajouter d'autres champs à mettre à jour ici, par exemple le statut :
         if (isset($data['status'])) {
             $ticket->setStatus($data['status']);
+        }
+        if (isset($data['message_refus'])) {
+            $ticket->setMessageRefus($data['message_refus']);
         }
         // Si vous souhaitez mettre à jour d'autres relations, il faudra également
         // récupérer les entités concernées (ex. pour une modification d'assignation).
