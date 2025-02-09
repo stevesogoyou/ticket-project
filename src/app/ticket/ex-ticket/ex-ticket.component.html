@@ -1,0 +1,33 @@
+<div class="card">
+    <p-table [value]="tickets" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>N°</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Date de création</th>
+<!--                <th>Message de refus</th>-->
+                <th>Nom de l'étudiant</th>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tick>
+            <tr>
+                <!-- Colonne Cercle -->
+                <td>
+                    <div class="circle">{{ tick.id }}</div>
+                </td>
+                <!-- Autres colonnes -->
+                <td>{{ tick.title }}</td>
+                <td>{{ tick.description }}</td>
+                <td>{{ tick.status }}</td>
+                <td>{{ tick.createdAt.substring(0,10) | date: 'dd/MM/yyyy '}}</td>
+<!--                <td>{{ tick.messageRefus }}</td>-->
+                <td>{{ tick.student?.firstname }} {{ tick.student?.lastname }}</td>
+                <!-- Colonne Actions -->
+
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

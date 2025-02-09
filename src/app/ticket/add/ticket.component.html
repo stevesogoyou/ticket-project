@@ -1,0 +1,68 @@
+<div class="flex mt-8">
+    <div class="card flex flex-col gap-6 w-full">
+        <div class="font-semibold text-xl">Ajouter un Ticket</div>
+
+        <!-- Champ Titre -->
+        <div class="flex flex-col">
+            <label for="title">Titre</label>
+            <input pInputText
+                   id="title"
+                   type="text"
+                   placeholder="Saisissez le titre du ticket"
+                   class="w-full"
+                   [(ngModel)]="ticketTitle"
+                   name="ticketTitle" />
+        </div>
+
+        <!-- Champ Description -->
+        <div class="flex flex-col">
+            <label for="description">Description</label>
+            <textarea pTextarea
+                      id="description"
+                      rows="4"
+                      placeholder="Décrivez votre demande"
+                      class="w-full"
+                      [(ngModel)]="ticketDescription"
+                      name="ticketDescription"></textarea>
+        </div>
+
+        <!-- Dropdown pour la catégorie -->
+        <div class="flex flex-col">
+            <label for="category">Catégorie</label>
+            <p-dropdown
+                id="category"
+                [options]="categoriesWithIndex"
+                optionLabel="label"
+                optionValue="value"
+                [(ngModel)]="selectedCategory"
+                name="selectedCategory"
+                placeholder="Sélectionnez une catégorie"
+                class="w-full">
+            </p-dropdown>
+        </div>
+
+        <!-- Dropdown pour l'utilisateur (étudiant) -->
+        <div class="flex flex-col">
+            <label for="user">Utilisateur</label>
+            <p-dropdown
+                id="user"
+                [options]="usersOptions"
+                optionLabel="label"
+                optionValue="value"
+                [(ngModel)]="selectedUser"
+                name="selectedUser"
+                placeholder="Sélectionnez un utilisateur"
+                class="w-full">
+            </p-dropdown>
+        </div>
+
+        <!-- Bouton de soumission -->
+        <div class="flex justify-end">
+            <button type="button"
+                    (click)="onSubmit()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow">
+                Ajouter Ticket
+            </button>
+        </div>
+    </div>
+</div>

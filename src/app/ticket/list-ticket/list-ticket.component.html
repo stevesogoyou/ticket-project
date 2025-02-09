@@ -1,0 +1,72 @@
+<div class="card">
+    <p-table [value]="tickets" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>N°</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Date de création</th>
+                <th>Nom de l'étudiant</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tick>
+            <tr>
+                <!-- Colonne Cercle -->
+                <td>
+                    <div class="circle">{{ tick.id }}</div>
+                </td>
+                <!-- Autres colonnes -->
+                <td>{{ tick.title }}</td>
+                <td>{{ tick.description }}</td>
+                <td>{{ tick.status }}</td>
+                <td>{{ tick.createdAt.substring(0,10) | date: 'dd/MM/yyyy '}}</td>
+                <td>{{ tick.student?.firstname }} {{ tick.student?.lastname }}</td>
+                <!-- Colonne Actions -->
+                <td>
+                    <!-- Si le ticket est "nouveau" -->
+                    <ng-container *ngIf="tick.status === 'nouveau'">
+                        <!-- Bouton pour changer le statut de "nouveau" à "en cours" -->
+                        <button class="btn btn-warning btn-sm"
+                                (click)="updateTicketStatusWithConfirmation(tick, 'en cours')"
+                                title="Passer à en cours">
+                            <mat-icon>schedule</mat-icon>
+                        </button>
+                        <!-- Bouton pour invalider le ticket -->
+                        <button class="btn btn-danger btn-sm"
+                                (click)="invalidateTicket(tick)"
+                                title="Invalider">
+                            <mat-icon>cancel</mat-icon>
+                        </button>
+                    </ng-container>
+
+                    <!-- Si le ticket est "en cours" -->
+                    <ng-container *ngIf="tick.status === 'en cours'">
+                        <!-- Bouton pour valider le ticket (passer à "traité") -->
+                        <button class="btn btn-success btn-sm"
+                                (click)="updateTicketStatusWithConfirmation(tick, 'traité')"
+                                title="Valider">
+                            <mat-icon>check_circle</mat-icon>
+                        </button>
+                        <!-- Bouton pour invalider le ticket -->
+                        <button class="btn btn-danger btn-sm"
+                                (click)="invalidateTicket(tick)"
+                                title="Invalider">
+                            <mat-icon>cancel</mat-icon>
+                        </button>
+                    </ng-container>
+
+
+                    <!-- Si le ticket est "traité" -->
+                    <ng-container *ngIf="tick.status === 'traité'">
+                        <!-- Bouton désactivé indiquant que le ticket a été validé (icône "check_circle") -->
+                        <button class="btn btn-success btn-sm" disabled title="Ticket validé">
+                            <mat-icon>check_circle</mat-icon>
+                        </button>
+                    </ng-container>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
